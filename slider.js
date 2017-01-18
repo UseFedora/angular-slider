@@ -99,7 +99,8 @@
         ngModel: '=?',
         ngModelLow: '=?',
         ngModelHigh: '=?',
-        onMoveStop: '='
+        
+        Stop: '='
       },
       template: '<div class="bar"><div class="selection"></div></div>\n<div class="handle low"></div><div class="handle high"></div>\n<div class="bubble limit low">{{ values.length ? values[floor || 0] : floor }}</div>\n<div class="bubble limit high">{{ values.length ? values[ceiling || values.length - 1] : ceiling }}</div>\n<div class="bubble value low">{{ values.length ? values[local.ngModelLow || local.ngModel || 0] : local.ngModelLow || local.ngModel || 0 }}</div>\n<div class="bubble value high">{{ values.length ? values[local.ngModelHigh] : local.ngModelHigh }}</div>',
       compile: function(element, attributes) {
@@ -228,7 +229,12 @@
                     scope[low] = scope.local[low];
                   }
                   currentRef = ref;
-                  scope.onMoveStop();
+                  if (scope.onMoveStop && typeof scope.onMoveStop == "function") {
+                    scope.onMoveStop();
+                  }
+                  if (scope.block && typeof scope.block.save == "function") {
+                    scope.block.save();
+                  }
                   return scope.$apply();
                 };
                 onMove = function(event) {
@@ -269,10 +275,6 @@
                   scope.local[currentRef] = newValue;
                   if (!scope.dragstop) {
                     scope[currentRef] = newValue;
-
-                    if (scope.block) {
-                      scope.block.save();
-                    }
                   }
                   setPointers();
                   return scope.$apply();
